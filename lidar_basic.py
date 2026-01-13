@@ -8,6 +8,9 @@ Demonstrates using a basic lidar sensor with a cylindrical scan pattern.
 
 import asyncio
 import cv2
+import threading
+from pynput import keyboard
+import time
 
 from projectairsim import ProjectAirSimClient, Drone, World
 from projectairsim.utils import projectairsim_log, unpack_image
@@ -42,8 +45,8 @@ async def main():
                             len(images[ImageType.SEGMENTATION]) > 0:
                     rgb_frames.append(images[ImageType.SCENE])
                     segmentation_frames.append(images[ImageType.SEGMENTATION])
-                    # Optional: display every 10th frame to reduce load
-                    if len(rgb_frames) % 10 == 0:
+                    # Optional: display every 5th frame to reduce load
+                    if len(rgb_frames) % 5 == 0:
                         # IDK if I need to unpack again here
                         image_display.receive(rgb_frames[-1], rgb_name)
                         image_display.receive(segmentation_frames[-1], seg_name)
@@ -86,34 +89,60 @@ async def main():
         # Start image capture task
         capture_task = asyncio.create_task(capture_images())
 
-        # Fly the drone around the scene
-        projectairsim_log().info("Move up")
+        # Take off
+        projectairsim_log().info("Taking off")
         move_task = await drone.move_by_velocity_async(
-            v_north=0.0, v_east=0.0, v_down=-2.0, duration=5.0
+            v_north=0.0, v_east=0.0, v_down=-2.0, duration=5.0, yaw=0.0, yaw_is_rate=True
         )
         await move_task
 
-        projectairsim_log().info("Move north")
+        # Manual control variables
+        velocity_forward = 2.0
+        yaw = 0.0
+        land = False
+
+        def on_press(key):
+            nonlocal velocity_forward, yaw, land
+            try:
+                if key == keyboard.Key.up:
+                    velocity_forward += 0.5
+                elif key == keyboard.Key.down:
+                    velocity_forward = max(0, velocity_forward - 0.5)
+                elif key == keyboard.Key.left:
+                    yaw += -0.3
+                elif key == keyboard.Key.right:
+                    yaw += 0.3
+                elif hasattr(key, 'char') and key.char.lower() == 'l':
+                    land = True
+            except AttributeError:
+                pass
+
+        def on_release(key):
+            pass
+            #nonlocal yaw
+            #if key in (keyboard.Key.left, keyboard.Key.right):
+            #    yaw = 0.0
+
+        listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        listener.start()
+
+        # Manual control loop
+        while not land:
+            # print(f"Velocity Forward: {velocity_forward}, Yaw Rate: {yaw}, Heading: {yaw}")
+            # t1 = time.time()
+            await drone.move_by_heading_async(
+                heading=yaw, speed=velocity_forward, v_down=0.0, duration=1.0, yaw_rate=0.3
+            )
+            await asyncio.sleep(0.5)
+            # t2 = time.time()
+            # projectairsim_log().info(f"Control loop iteration took {t2 - t1:.2f} seconds")
+
+        listener.stop()
+
+        # Land
+        projectairsim_log().info("Landing")
         move_task = await drone.move_by_velocity_async(
-            v_north=4.0, v_east=0.0, v_down=0.0, duration=24.0
-        )
-        await move_task
-
-        # projectairsim_log().info("Move north-west")
-        # move_task = await drone.move_by_velocity_async(
-        #     v_north=4.0, v_east=-4.0, v_down=0.0, duration=8.0
-        # )
-        # await move_task
-
-        # projectairsim_log().info("Move north")
-        # move_task = await drone.move_by_velocity_async(
-        #     v_north=4.0, v_east=0.0, v_down=0.0, duration=3.0
-        # )
-        # await move_task
-
-        projectairsim_log().info("Move down")
-        move_task = await drone.move_by_velocity_async(
-            v_north=0.0, v_east=0.0, v_down=2.0, duration=5.0
+            v_north=0.0, v_east=0.0, v_down=4.0, duration=5.0, yaw=0.0, yaw_is_rate=True
         )
         await move_task
 
