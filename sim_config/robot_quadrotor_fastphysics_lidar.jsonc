@@ -312,7 +312,7 @@
           "image-type": 0,
           "width": 1280,
           "height": 720,
-          "fov-degrees": 90,
+          "fov-degrees": 60,
           "capture-enabled": true,
           "streaming-enabled": true,
           "pixels-as-float": false,
@@ -339,9 +339,9 @@
       "capture-settings": [
         {
           "image-type": 0,
-          "width": 400,
-          "height": 225,
-          "fov-degrees": 90,
+          "width": 640,
+          "height": 480,
+          "fov-degrees": 60,
           "capture-enabled": true,
           "streaming-enabled": false,
           "pixels-as-float": false,
@@ -350,9 +350,9 @@
         },
         {
           "image-type": 1,
-          "width": 400,
-          "height": 225,
-          "fov-degrees": 90,
+          "width": 640,
+          "height": 480,
+          "fov-degrees": 60,
           "capture-enabled": false,
           "streaming-enabled": false,
           "pixels-as-float": false,
@@ -360,9 +360,9 @@
         },
         {
           "image-type": 2,
-          "width": 400,
-          "height": 225,
-          "fov-degrees": 90,
+          "width": 640,
+          "height": 480,
+          "fov-degrees": 60,
           "capture-enabled": true,
           "streaming-enabled": false,
           "pixels-as-float": false,
@@ -370,9 +370,9 @@
         },
         {
           "image-type": 3,
-          "width": 400,
-          "height": 225,
-          "fov-degrees": 90,
+          "width": 640,
+          "height": 480,
+          "fov-degrees": 60,
           "capture-enabled": true,
           "streaming-enabled": false,
           "pixels-as-float": false,
@@ -400,7 +400,7 @@
       ],
       "origin": {
         "xyz": "0 0.0 0.0",
-        "rpy-deg": "0 -90 0"
+        "rpy-deg": "0 -75 0"
       }
     },
     {
@@ -492,7 +492,8 @@
         // x y z in meters, relative to parent-link
         "xyz": "0.0 0.0 0.2",
         // roll pitch yaw in degrees, relative to parent-link
-        "rpy-deg": "90.0 0.0 90.0"
+        // "rpy-deg": "90.0 0.0 90.0"
+        "rpy-deg": "75.0 0.0 90.0"
       },
       "report-point-cloud": true,
       "report-azimuth-elevation-range": false,

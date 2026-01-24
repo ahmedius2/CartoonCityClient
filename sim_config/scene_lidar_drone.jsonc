@@ -5,8 +5,8 @@
       "type": "robot",
       "name": "Drone1",
       "origin": {
-        "xyz": "-46.0 67.0 -1.0",
-        "rpy-deg": "0 0 0"
+        "xyz": "-7.4 30.4 -1.0",
+        "rpy-deg": "0 0 90"
       },
       "robot-config": "robot_quadrotor_fastphysics_lidar.jsonc"
     }
